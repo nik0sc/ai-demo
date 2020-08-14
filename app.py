@@ -6,6 +6,7 @@ from urllib.request import urlopen
 from io import BytesIO
 from typing import Tuple, Dict
 import sys
+import os
 
 import torch
 import torchvision.transforms as transforms
@@ -13,6 +14,7 @@ import numpy as np
 import cv2
 
 PATH_TO_MODEL = "model_1e-4_4.pt"
+GIT_REV = os.environ.get("GIT_REV", "unknown")[:8]
 app = Flask(__name__)
 
 # Load model once and be done with it
@@ -123,7 +125,8 @@ def process():
 @ app.route("/")
 @ app.route("/index.html")
 def index():
-    return render_template("index.html")
+    return render_template("index.html",
+                           GIT_REV=GIT_REV)
 
 
 if __name__ == "__main__":
