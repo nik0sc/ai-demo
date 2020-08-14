@@ -8,6 +8,6 @@ MarkupSafe==1.1.1
 numpy==1.19.1
 opencv-python-headless==4.4.0.40
 Pillow==7.2.0
-torch==1.6.0+cpu
-torchvision==0.7.0+cpu
+https://download.pytorch.org/whl/cpu/torch-1.6.0%2Bcpu-cp38-cp38-linux_x86_64.whl
+https://download.pytorch.org/whl/cpu/torchvision-0.7.0%2Bcpu-cp38-cp38-linux_x86_64.whl
 Werkzeug==1.0.1
