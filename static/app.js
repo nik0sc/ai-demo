@@ -21,7 +21,7 @@
     $("#submit").click(function () {
       const frame1 = $("#image-1").attr("src");
       const frame2 = $("#image-2").attr("src");
-      // todo: check image sizes match
+      // todo: check image sizes match (Or just leave that to the backend)
       this.disabled = true;
       $("#submit-message").text("");
       $.post(
@@ -35,12 +35,12 @@
             .attr("src", data.frameinter)
             .css("visibility", "visible");
           $("#result-image-3").attr("src", frame2);
-          console.log(data.info);
+          console.log(data.extra);
         },
         "json"
       )
-        .fail((xhr, status) => {
-          $("#submit-message").text(status);
+        .fail((xhr) => {
+          $("#submit-message").text(xhr.responseText);
         })
         .always(() => {
           this.disabled = false;
