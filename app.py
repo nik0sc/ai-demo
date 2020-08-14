@@ -65,11 +65,11 @@ def interpolate(im1: Image.Image, im2: Image.Image, t: float) -> Tuple[Image.Ima
     if im1.size != im2.size:
         raise ValueError("Image sizes don't match")
 
-    if im1.size[0] & 64 != 0:
+    if im1.size[0] & 63 != 0:
         # pad = 8 - (im1.size[0] & 8)
         raise ValueError("Dim 1 error")
 
-    if im1.size[1] & 64 != 0:
+    if im1.size[1] & 63 != 0:
         raise ValueError("Dim 2 error")
 
     # May be slow, consider cached loading
@@ -106,13 +106,13 @@ def process():
     try:
         frameinter, extra = interpolate(frame1, frame2, t)
     except ValueError as e:
-        return Response({
+        return {
             "message": f"Invalid frames: {e.args[0]}"
-        }, 400)
+        }, 400
     except RuntimeError as e:
-        return Response({
+        return {
             "message": f"Model says: {e.args[0]}"
-        }, 500)
+        }, 500
 
     return {
         "frameinter": write_image_to_data_url(frameinter),
