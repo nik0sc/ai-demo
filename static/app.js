@@ -1,6 +1,7 @@
 "use strict";
 
 (function () {
+  const files_uploaded = {};
   function createFileInputHandler(i) {
     $(`#file-input-${i}`).change(function () {
       // append to img
@@ -33,7 +34,7 @@
       const outformat = $("#param-outformat")[0].value;
       // todo: check image sizes match (Or just leave that to the backend)
       this.disabled = true;
-      $("#submit-message").text("");
+      $("#submit-message").text("").addClass("d-none");
       $.post(
         "/process",
         { frame1, frame2, t, downsample, outformat },
@@ -54,7 +55,7 @@
         "json"
       )
         .fail((xhr) => {
-          $("#submit-message").text(xhr.responseText);
+          $("#submit-message").text(xhr.responseText).removeClass("d-none");
         })
         .always(() => {
           this.disabled = false;

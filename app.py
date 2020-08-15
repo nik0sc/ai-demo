@@ -43,6 +43,7 @@ def write_image_to_data_url(image, format="png"):
 
 
 def flow_to_image(flow: torch.Tensor) -> Image.Image:
+    # lifted from visualise.py
     flow = flow.squeeze(0).numpy().transpose((1, 2, 0))
     hsv = np.zeros((flow.shape[0], flow.shape[1], 3), dtype=np.uint8)
     hsv[..., 1] = 255
@@ -101,11 +102,13 @@ def interpolate(im1: Image.Image, im2: Image.Image,
 
     im1t, im2t = [transform(x).unsqueeze(0).to("cpu") for x in (im1p, im2p)]
 
+    # Do the actual prediction
     with torch.no_grad():
         img_recon, flow_t_0, flow_t_1, w1, w2 = model(im1t, im2t, t)
 
     img_recon = img_recon.squeeze(0).numpy().transpose((1, 2, 0)) * 255
     img_recon = img_recon.astype(np.uint8)
+    # Convert everything to pil images
     iminter = Image.fromarray(img_recon)
 
     extra = {
@@ -115,6 +118,7 @@ def interpolate(im1: Image.Image, im2: Image.Image,
         "flow_t_1": flow_to_image(flow_t_1)
     }
 
+    # If we added padding, make sure we remove it
     if iminter.size != restoredim:
         iminter = iminter.crop((0, 0, *restoredim))
         for k in extra:
@@ -125,8 +129,11 @@ def interpolate(im1: Image.Image, im2: Image.Image,
 
 @ app.route('/process', methods=["POST"])
 def process():
-    frame1 = parse_data_url_for_image(request.form['frame1'])
-    frame2 = parse_data_url_for_image(request.form['frame2'])
+    try:
+        frame1 = parse_data_url_for_image(request.form['frame1'])
+        frame2 = parse_data_url_for_image(request.form['frame2'])
+    except:
+        return "Can't parse data url or no image selected", 400
     try:
         t = float(request.form['t'])
     except (ValueError, KeyError):
@@ -145,13 +152,9 @@ def process():
     try:
         frameinter, extra = interpolate(frame1, frame2, t, downsample)
     except ValueError as e:
-        return {
-            "message": f"Invalid frames: {e.args[0]}"
-        }, 400
+        return f"Invalid frames: {e.args[0]}", 400
     except RuntimeError as e:
-        return {
-            "message": f"Model says: {e.args[0]}"
-        }, 500
+        return f"Model says: {e.args[0]}", 500
 
     return {
         "frameinter": write_image_to_data_url(frameinter, outformat),
