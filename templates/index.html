@@ -38,15 +38,55 @@
 
         <div class="pt-3" id="control-container">
           <!-- this is not accessible apparently -->
-          <label for="file-input-1" class="btn btn-primary" id="upload-1">
-            Select frame 1
-          </label>
-          <label for="file-input-2" class="btn btn-primary" id="upload-2">
-            Select frame 2
-          </label>
-          <button type="button" class="btn btn-primary" id="submit">
-            Process →
-          </button>
+          <div>
+            <label
+              for="file-input-1"
+              class="btn btn-primary mb-3"
+              id="upload-1"
+            >
+              Select frame 1
+            </label>
+            <label
+              for="file-input-2"
+              class="btn btn-primary mb-3"
+              id="upload-2"
+            >
+              Select frame 2
+            </label>
+            <button type="button" class="btn btn-primary mb-3" id="submit">
+              Process →
+            </button>
+          </div>
+          <div class="row">
+            <div class="col">
+              <label for="param-t" class="form-label">t:</label>
+              <input
+                type="text"
+                id="param-t"
+                value="0.5"
+                class="form-control"
+              />
+            </div>
+            <div class="col">
+              <label for="param-downsample" class="form-check-label">
+                downsample:
+              </label>
+              <input
+                type="checkbox"
+                id="param-downsample"
+                checked
+                class="form-check-input"
+              />
+            </div>
+            <div class="col">
+              <label for="param-outformat" class="form-label">outformat:</label>
+              <select id="param-outformat" class="form-select">
+                {% for format in formats %}
+                <option value="{{format}}">{{format}}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
           <span id="submit-message"></span>
           <!-- Hidden file input goes here -->
           <input
@@ -73,10 +113,11 @@
               For the best experience please upload video frames that meet these
               requirements:
             </p>
-            <p>1. Each dimension multiple of 64</p>
-            <p>2. 8bpc RGB, no alpha channel</p>
-            <p>3. Around 256-512px per side</p>
-            <p>4. No large movements or changes in lighting</p>
+            <p>
+              1. Not too large, otherwise nginx may reject your request and it
+              will take super long to process
+            </p>
+            <p>2. No large movements or changes in lighting</p>
             <p>version {{GIT_REV}}</p>
           </div>
         </div>

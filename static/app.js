@@ -19,14 +19,17 @@
 
     let result_valid = false;
     $("#submit").click(function () {
-      const frame1 = $("#image-1").attr("src");
-      const frame2 = $("#image-2").attr("src");
+      const frame1 = $("#image-1")[0].src;
+      const frame2 = $("#image-2")[0].src;
+      const t = $("#param-t")[0].value;
+      const downsample = $("#param-downsample")[0].checked;
+      const outformat = $("#param-outformat")[0].value;
       // todo: check image sizes match (Or just leave that to the backend)
       this.disabled = true;
       $("#submit-message").text("");
       $.post(
         "/process",
-        { frame1, frame2 },
+        { frame1, frame2, t, downsample, outformat },
         (data) => {
           result_valid = true;
           $("#result-container>").css("visibility", "hidden");

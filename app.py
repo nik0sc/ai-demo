@@ -32,12 +32,12 @@ def parse_data_url_for_image(url):
         return image
 
 
-def write_image_to_data_url(image):
+def write_image_to_data_url(image, format="png"):
     stream = BytesIO()
-    image.save(stream, "png")
+    image.save(stream, format)
     # stream.seek(0)
     enc = str(b64encode(stream.getbuffer()), "ascii")
-    out = f'data:image/png;base64,{enc}'
+    out = f'data:image/{format};base64,{enc}'
     stream.close()
     return out
 
@@ -58,28 +58,48 @@ def weight_map_to_image(w: torch.Tensor) -> Image.Image:
     return Image.fromarray((w * 255).astype(np.uint8), 'L')
 
 
-def interpolate(im1: Image.Image, im2: Image.Image, t: float) -> Tuple[Image.Image, Dict[str, Image.Image]]:
-    # Check image dimensions match
-    # Pad to multiple of 8 each axis
-    # Other normalising actions as needed
-    # Send through interpolation model
-    # Create image and return
+def process_image(im: Image.Image, downsample: bool) \
+        -> Tuple[Image.Image, Tuple[int, int]]:
+    # Convert color
+    if im.mode != "RGB":
+        im = im.convert("RGB")
+
+    # Reduce the picture size to something reasonable
+    if downsample and any(dim > 512 for dim in im.size):
+        divisor = max(im.size) / 512
+        # Lose fractional pixels if we have to
+        resizedim = tuple(int(dim/divisor) for dim in im.size)
+        restoredim = resizedim
+        im = im.resize(resizedim)
+    else:
+        restoredim = im.size
+
+    # Pad to multiple of 64
+    pad = [(64 - (dim & 63)) & 63 for dim in im.size]
+    if any(paddim > 0 for paddim in pad):
+        newdim = tuple(dim+paddim for dim, paddim in zip(im.size, pad))
+        impad = Image.new("RGB", newdim)
+        impad.paste(im)
+        im = impad
+
+    return im, restoredim
+
+
+def interpolate(im1: Image.Image, im2: Image.Image,
+                t: float, downsample: bool) \
+        -> Tuple[Image.Image, Dict[str, Image.Image]]:
     if im1.size != im2.size:
         raise ValueError("Image sizes don't match")
 
-    if im1.size[0] & 63 != 0:
-        # pad = 8 - (im1.size[0] & 8)
-        raise ValueError("Dim 1 error")
+    # Both will be restored to the same size
+    im1p, restoredim = process_image(im1, downsample)
+    im2p, _ = process_image(im2, downsample)
 
-    if im1.size[1] & 63 != 0:
-        raise ValueError("Dim 2 error")
-
-    # May be slow, consider cached loading
     transform = transforms.Compose([
         transforms.ToTensor()
     ])
 
-    im1t, im2t = [transform(x).unsqueeze(0).to("cpu") for x in (im1, im2)]
+    im1t, im2t = [transform(x).unsqueeze(0).to("cpu") for x in (im1p, im2p)]
 
     with torch.no_grad():
         img_recon, flow_t_0, flow_t_1, w1, w2 = model(im1t, im2t, t)
@@ -87,6 +107,9 @@ def interpolate(im1: Image.Image, im2: Image.Image, t: float) -> Tuple[Image.Ima
     img_recon = img_recon.squeeze(0).numpy().transpose((1, 2, 0)) * 255
     img_recon = img_recon.astype(np.uint8)
     iminter = Image.fromarray(img_recon)
+
+    if iminter.size != restoredim:
+        iminter = iminter.crop((0, 0, *restoredim))
 
     return iminter, {
         "w1": weight_map_to_image(w1),
@@ -106,7 +129,17 @@ def process():
         t = 0.5
 
     try:
-        frameinter, extra = interpolate(frame1, frame2, t)
+        downsample = request.form['downsample'] != "false"
+    except (ValueError, KeyError):
+        downsample = False
+
+    try:
+        outformat = str(request.form['outformat'])
+    except (ValueError, KeyError):
+        outformat = "png"
+
+    try:
+        frameinter, extra = interpolate(frame1, frame2, t, downsample)
     except ValueError as e:
         return {
             "message": f"Invalid frames: {e.args[0]}"
@@ -117,8 +150,9 @@ def process():
         }, 500
 
     return {
-        "frameinter": write_image_to_data_url(frameinter),
-        "extra": {k: write_image_to_data_url(v) for k, v in extra.items()}
+        "frameinter": write_image_to_data_url(frameinter, outformat),
+        "extra": {k: write_image_to_data_url(v, outformat)
+                  for k, v in extra.items()}
     }
 
 
@@ -126,7 +160,8 @@ def process():
 @ app.route("/index.html")
 def index():
     return render_template("index.html",
-                           GIT_REV=GIT_REV)
+                           GIT_REV=GIT_REV,
+                           formats=["jpeg", "png"])
 
 
 if __name__ == "__main__":
