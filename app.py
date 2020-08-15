@@ -108,15 +108,19 @@ def interpolate(im1: Image.Image, im2: Image.Image,
     img_recon = img_recon.astype(np.uint8)
     iminter = Image.fromarray(img_recon)
 
-    if iminter.size != restoredim:
-        iminter = iminter.crop((0, 0, *restoredim))
-
-    return iminter, {
+    extra = {
         "w1": weight_map_to_image(w1),
         "w2": weight_map_to_image(w2),
         "flow_t_0": flow_to_image(flow_t_0),
         "flow_t_1": flow_to_image(flow_t_1)
     }
+
+    if iminter.size != restoredim:
+        iminter = iminter.crop((0, 0, *restoredim))
+        for k in extra:
+            extra[k] = extra[k].crop((0, 0, *restoredim))
+
+    return iminter, extra
 
 
 @ app.route('/process', methods=["POST"])
