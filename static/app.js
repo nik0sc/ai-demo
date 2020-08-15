@@ -13,6 +13,13 @@
     });
   }
 
+  function extraButtonActive(button) {
+    $("#extra-control-container button")
+      .addClass("btn-outline-primary")
+      .removeClass("btn-primary");
+    $(button).addClass("btn-primary").removeClass("btn-outline-primary");
+  }
+
   $(() => {
     createFileInputHandler("1");
     createFileInputHandler("2");
@@ -38,7 +45,11 @@
             .attr("src", data.frameinter)
             .css("visibility", "visible");
           $("#result-image-3").attr("src", frame2);
-          console.log(data.extra);
+          $("#result-control-container button").attr("disabled", false);
+          $("#result-flow-1").attr("src", data.extra.flow_t_0);
+          $("#result-flow-2").attr("src", data.extra.flow_t_1);
+          $("#result-wm-1").attr("src", data.extra.w1);
+          $("#result-wm-2").attr("src", data.extra.w2);
         },
         "json"
       )
@@ -54,6 +65,11 @@
     $("#play").click(function () {
       if (play_interval === null && result_valid) {
         this.textContent = "Pause";
+        $("#extra-control-container button").attr("disabled", true);
+        $("#result-container .--extra").css("visibility", "hidden");
+        $("#extra-control-container button")
+          .addClass("btn-outline-primary")
+          .removeClass("btn-primary");
         let current_frame = 1;
         play_interval = setInterval(() => {
           if (current_frame > 3) {
@@ -65,9 +81,38 @@
         }, 500);
       } else {
         this.textContent = "Play";
+        $("#extra-control-container button").attr("disabled", false);
         clearInterval(play_interval);
         play_interval = null;
       }
+    });
+
+    $("#show-flow-1").click(function () {
+      extraButtonActive(this);
+      $("#result-container img").css("visibility", "hidden");
+      $("#result-image-1").css("visibility", "visible");
+      $("#result-flow-1").css("visibility", "visible");
+    });
+
+    $("#show-flow-2").click(function () {
+      extraButtonActive(this);
+      $("#result-container img").css("visibility", "hidden");
+      $("#result-image-3").css("visibility", "visible");
+      $("#result-flow-2").css("visibility", "visible");
+    });
+
+    $("#show-wm-1").click(function () {
+      extraButtonActive(this);
+      $("#result-container img").css("visibility", "hidden");
+      $("#result-image-1").css("visibility", "visible");
+      $("#result-wm-1").css("visibility", "visible");
+    });
+
+    $("#show-wm-2").click(function () {
+      extraButtonActive(this);
+      $("#result-container img").css("visibility", "hidden");
+      $("#result-image-3").css("visibility", "visible");
+      $("#result-wm-2").css("visibility", "visible");
     });
   });
 })();

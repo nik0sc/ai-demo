@@ -11,5 +11,5 @@ If you want to run locally just type `gunicorn app:app` after installing depende
 - ~~automatically resize frames to multiples of 64~~
 - ~~automatically convert frames to 8bpc RGB removing alpha if it's there~~
 - ~~automatically downsample frames to something reasonable~~
-- Show on image the flow and weight map (this is already returned to the front end, check the console after processing)
+- ~~Show on image the flow and weight map~~
 - More detailed error messages
