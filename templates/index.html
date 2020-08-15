@@ -25,14 +25,20 @@
       <div class="col-md-3 d-flex flex-column">
         <div class="flex-fill" id="image-container-1">
           <img class="img-fluid" id="image-1" />
-          <div class="text-center align-middle" id="image-placeholder-1">
-            No image selected.
+          <div
+            class="d-flex justify-content-center mt-3"
+            id="image-placeholder-1"
+          >
+            <div class="text-center">No image selected.</div>
           </div>
         </div>
         <div class="flex-fill" id="image-container-2">
           <img class="img-fluid" id="image-2" />
-          <div class="text-center align-middle" id="image-placeholder-2">
-            No image selected.
+          <div
+            class="d-flex justify-content-center mt-3"
+            id="image-placeholder-2"
+          >
+            <div class="text-center">No image selected.</div>
           </div>
         </div>
 
@@ -108,23 +114,48 @@
           <img class="img-fluid position-absolute w-100" id="result-image-1" />
           <img class="img-fluid position-absolute w-100" id="result-image-2" />
           <img class="img-fluid position-absolute w-100" id="result-image-3" />
-          <div class="text-center align-middle" id="result-placeholder">
-            <p>
-              For the best experience please upload video frames that meet these
-              requirements:
-            </p>
-            <p>
-              1. Not too large, otherwise nginx may reject your request and it
-              will take super long to process
-            </p>
-            <p>2. No large movements or changes in lighting</p>
-            <p>version {{GIT_REV}}</p>
+          <div class="d-flex justify-content-center h-100">
+            <div class="text-center w-50 my-auto" id="result-placeholder">
+              <p>
+                For the best experience please upload video frames that meet
+                these requirements:
+              </p>
+              <p>
+                1. Not too large, otherwise nginx may reject your request and it
+                will take super long to process
+              </p>
+              <p>2. No large movements or changes in lighting</p>
+              <p>The options mean:</p>
+              <p>
+                t: Time between frames to predict. 0.5 seems to give the best
+                results
+              </p>
+              <p>
+                downsample: Reduce resolution of frame before predicting. This
+                should reduce the time needed to see a result, although it will
+                be noticeably lower-res
+              </p>
+              <p>
+                outformat: jpg is probably the right option most of the time.
+                png is lossless but takes way longer to transfer
+              </p>
+              <p>
+                Then press "process" and the predicted frame will appear on the
+                right, over this text. Press "play" to see the animated frames
+                with the predicted frame in between.
+              </p>
+            </div>
           </div>
         </div>
-        <div class="pt-3" style="z-index: 1;" id="result-control-container">
+        <div
+          class="pt-3 d-flex align-items-center"
+          style="z-index: 1;"
+          id="result-control-container"
+        >
           <button type="button" class="btn btn-primary" id="play">
             Play
           </button>
+          <span class="ml-auto">version {{GIT_REV}}</span>
         </div>
       </div>
     </div>
