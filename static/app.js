@@ -35,6 +35,7 @@
       // todo: check image sizes match (Or just leave that to the backend)
       this.disabled = true;
       $("#submit-message").text("").addClass("d-none");
+      $("#spinner").removeClass("d-none");
       $.post(
         "/process",
         { frame1, frame2, t, downsample, outformat },
@@ -59,6 +60,7 @@
         })
         .always(() => {
           this.disabled = false;
+          $("#spinner").addClass("d-none");
         });
     });
 
