@@ -136,6 +136,8 @@ def process():
         return "Can't parse data url or no image selected", 400
     try:
         t = float(request.form['t'])
+        if not 0 <= t <= 1:
+            return f"Invalid t: {t}", 400
     except (ValueError, KeyError):
         t = 0.5
 

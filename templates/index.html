@@ -19,12 +19,20 @@
       crossorigin="anonymous"
     ></script>
     <script src="../static/app.js"></script>
+    <style>
+      .app-left-image {
+        max-height: 33vh;
+      }
+      .app-right-image {
+        max-height: 80vh;
+      }
+    </style>
   </head>
   <body class="p-3 p-md-5 position-absolute h-100 w-100 d-flex">
     <div class="row">
       <div class="col-md-3 d-flex flex-column">
         <div class="flex-fill" id="image-container-1">
-          <img class="img-fluid" id="image-1" />
+          <img class="img-fluid app-left-image" id="image-1" />
           <div
             class="d-flex justify-content-center mt-3"
             id="image-placeholder-1"
@@ -33,7 +41,7 @@
           </div>
         </div>
         <div class="flex-fill" id="image-container-2">
-          <img class="img-fluid" id="image-2" />
+          <img class="img-fluid app-left-image" id="image-2" />
           <div
             class="d-flex justify-content-center mt-3"
             id="image-placeholder-2"
@@ -117,26 +125,35 @@
       </div>
       <div class="col-md-9 d-flex flex-column">
         <div class="flex-md-grow-1 position-relative" id="result-container">
-          <img class="img-fluid position-absolute w-100" id="result-image-1" />
-          <img class="img-fluid position-absolute w-100" id="result-image-2" />
-          <img class="img-fluid position-absolute w-100" id="result-image-3" />
           <img
-            class="img-fluid position-absolute w-100 --extra"
+            class="img-fluid position-absolute w-100 app-right-image"
+            id="result-image-1"
+          />
+          <img
+            class="img-fluid position-absolute w-100 app-right-image"
+            id="result-image-2"
+          />
+          <img
+            class="img-fluid position-absolute w-100 app-right-image"
+            id="result-image-3"
+          />
+          <img
+            class="img-fluid position-absolute w-100 app-right-image --extra"
             id="result-flow-1"
             style="opacity: 0.5;"
           />
           <img
-            class="img-fluid position-absolute w-100 --extra"
+            class="img-fluid position-absolute w-100 app-right-image --extra"
             id="result-flow-2"
             style="opacity: 0.5;"
           />
           <img
-            class="img-fluid position-absolute w-100 --extra"
+            class="img-fluid position-absolute w-100 app-right-image --extra"
             id="result-wm-1"
             style="opacity: 0.7;"
           />
           <img
-            class="img-fluid position-absolute w-100 --extra"
+            class="img-fluid position-absolute w-100 app-right-image --extra"
             id="result-wm-2"
             style="opacity: 0.7;"
           />
@@ -159,8 +176,12 @@
               </p>
               <p>
                 downsample: Reduce resolution of frame before predicting. This
-                should reduce the time needed to see a result, although it will
-                be noticeably lower-res
+                should reduce the time and memory needed to see a result,
+                although it will be noticeably lower-res.
+                <strong>
+                  It's strongly recommended to leave this checked on the online
+                  demo.
+                </strong>
               </p>
               <p>
                 outformat: jpg is probably the right option most of the time.
@@ -178,13 +199,13 @@
         </div>
         <div
           class="pt-3 d-flex align-items-center"
-          style="z-index: 1;"
+          style="z-index: 1; background-color: white;"
           id="result-control-container"
         >
           <button type="button" class="btn btn-primary mr-3" id="play" disabled>
             Play
           </button>
-          <div id="extra-control-container" class="btn-group" role="group">
+          <div id="extra-control-container" class="btn-group mr-3" role="group">
             <button
               type="button"
               class="btn btn-outline-primary"
@@ -217,6 +238,17 @@
             >
               Show weight map on frame 2
             </button>
+          </div>
+          <div>
+            <label for="result-w100" class="form-check-label">
+              portrait:
+            </label>
+            <input
+              type="checkbox"
+              id="result-w100"
+              class="form-check-input"
+              checked="false"
+            />
           </div>
           <span class="ml-auto">version {{GIT_REV}}</span>
         </div>

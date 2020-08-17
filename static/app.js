@@ -52,6 +52,14 @@
           $("#result-flow-2").attr("src", data.extra.flow_t_1);
           $("#result-wm-1").attr("src", data.extra.w1);
           $("#result-wm-2").attr("src", data.extra.w2);
+
+          const { naturalHeight, naturalWidth } = $("#result-image-2")[0];
+
+          if (naturalHeight > naturalWidth) {
+            $("#result-w100").prop("checked", true).change();
+          } else {
+            $("#result-w100").prop("checked", false).change();
+          }
         },
         "json"
       )
@@ -116,6 +124,14 @@
       $("#result-container img").css("visibility", "hidden");
       $("#result-image-3").css("visibility", "visible");
       $("#result-wm-2").css("visibility", "visible");
+    });
+
+    $("#result-w100").change(function () {
+      if (this.checked) {
+        $("#result-container img").removeClass("w-100").addClass("h-100");
+      } else {
+        $("#result-container img").addClass("w-100").removeClass("h-100");
+      }
     });
   });
 })();
